@@ -37,7 +37,7 @@ CONCEITOS = {
     },
 
     "dre": {
-        "titulo": "Demonstração do Resultado do Exercício — DRE",
+        "titulo": "Demonstração do Resultado do Exercício (DRE)",
         "definicao": (
             "A DRE apresenta as receitas, os custos e as despesas de determinado "
             "período, permitindo verificar se houve lucro, superávit, prejuízo ou déficit."

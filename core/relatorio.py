@@ -98,7 +98,7 @@ section{{margin-top:28px}} @media print{{body{{margin:10mm}} .cards{{grid-templa
 </style>
 </head>
 <body>
-<h1>STEM FinanceLab — Relatório da Simulação</h1>
+<h1>STEM FinanceLab: Relatório da Simulação</h1>
 <p class='muted'>Versão {APP_VERSION} · Tentativa {tentativa} · Gerado em {datetime.now().strftime('%d/%m/%Y às %H:%M')}</p>
 
 <section><h2>Identificação do participante</h2>

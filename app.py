@@ -1,6 +1,7 @@
 import logging
 
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -64,8 +65,21 @@ from data.conceitos import CONCEITOS
 configurar_logs()
 logger = logging.getLogger(__name__)
 
+
+def rolar_para_topo() -> None:
+    """Reposiciona a tela no início após a troca de etapa em dispositivos móveis."""
+    components.html(
+        """
+        <script>
+            window.parent.scrollTo({top: 0, left: 0, behavior: 'instant'});
+        </script>
+        """,
+        height=0,
+        width=0,
+    )
+
 st.set_page_config(
-    page_title="STEM FinanceLab — Jogo Estratégico",
+    page_title="STEM FinanceLab: Jogo Estratégico",
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -164,6 +178,12 @@ TERMOS_EDUCACIONAIS = {
     "patrimonio_liquido": (
         "O Patrimônio Líquido corresponde aos recursos próprios do projeto após a dedução "
         "das obrigações. No simulador, reúne o capital inicial e o resultado obtido."
+    ),
+    "margem_liquida": (
+        "A Margem Líquida indica qual percentual da receita líquida permaneceu como lucro "
+        "após a dedução dos custos e das despesas. Quanto maior e positiva, maior foi a "
+        "capacidade do projeto de transformar receita em resultado; valores negativos "
+        "representam prejuízo."
     ),
 }
 
@@ -287,7 +307,7 @@ def pagina_inicial() -> None:
         missao = st.radio(
             "Escolha o porte do projeto que deseja administrar",
             options=list(CENARIOS.keys()),
-            format_func=lambda chave: f"{CENARIOS[chave]['nome']} — porte {CENARIOS[chave]['porte'].lower()}",
+            format_func=lambda chave: f"{CENARIOS[chave]['nome']} (porte {CENARIOS[chave]['porte'].lower()})",
             horizontal=True,
         )
         cenario = obter_cenario(missao)
@@ -393,7 +413,7 @@ def pagina_cenario() -> None:
     c2.metric("Capacidade máxima", f"{cenario['capacidade']} pessoas")
     c3.metric("Referência de recursos", formatar_moeda(cenario["orcamento_inicial"]))
 
-    st.markdown("### Rodada 1 — Escolha o modelo do evento")
+    st.markdown("### Rodada 1: Escolha o modelo do evento")
     modelo = st.radio(
         "Qual estratégia principal será utilizada?",
         list(modelos.keys()),
@@ -402,7 +422,7 @@ def pagina_cenario() -> None:
     )
     st.info(modelos[modelo]["descricao"])
 
-    st.markdown("### Rodada 2 — Defina público e fontes")
+    st.markdown("### Rodada 2: Defina público e fontes")
     col_publico, col_recursos = st.columns(2)
     with col_publico:
         publico_previsto = st.slider(
@@ -736,6 +756,7 @@ def pagina_planejamento() -> None:
         ]
         st.session_state.indice_evento = 0
         st.session_state.decisoes_eventos = []
+        st.session_state.rolar_topo_evento = True
 
         ir_para("evento")
 
@@ -743,6 +764,9 @@ def pagina_planejamento() -> None:
 def pagina_evento() -> None:
     cabecalho(compacto=True)
     st.title("Eventos inesperados")
+
+    if st.session_state.pop("rolar_topo_evento", False):
+        rolar_para_topo()
 
     if "eventos_sorteados" not in st.session_state:
         st.session_state.eventos_sorteados = sortear_eventos(
@@ -775,8 +799,17 @@ def pagina_evento() -> None:
     escolha_texto = st.radio(
         "Como você deseja responder a esta situação?",
         textos_opcoes,
+        index=None,
         key=f"evento_{evento['id']}_opcao",
+        help="Leia a descrição do imprevisto e selecione conscientemente uma alternativa.",
     )
+
+    if escolha_texto is None:
+        st.info(
+            "Leia a descrição do imprevisto acima e selecione uma alternativa para "
+            "visualizar seus impactos antes de confirmar a decisão."
+        )
+        return
 
     escolha = next(
         opcao for opcao in opcoes
@@ -893,6 +926,7 @@ def pagina_evento() -> None:
         if st.session_state.indice_evento >= total_eventos:
             ir_para("planejamento_concluido")
         else:
+            st.session_state.rolar_topo_evento = True
             st.rerun()
 
 
@@ -938,7 +972,11 @@ def _exibir_dashboard_financeiro(motor: dict, resumo: dict, dre: dict, balanco: 
         })
         fig = px.bar(comparativo, x="Grupo", y="Valor", text_auto=".2s", title="Receita, gastos e resultado")
         fig.update_layout(yaxis_title="Valor (R$)", xaxis_title="", showlegend=False)
-        st.plotly_chart(fig, width="stretch")
+        st.plotly_chart(
+            fig,
+            width="stretch",
+            config={"staticPlot": True, "displayModeBar": False},
+        )
 
     with col2:
         gastos = {}
@@ -949,7 +987,11 @@ def _exibir_dashboard_financeiro(motor: dict, resumo: dict, dre: dict, balanco: 
         if gastos:
             df_gastos = pd.DataFrame({"Categoria": list(gastos), "Valor": list(gastos.values())})
             fig = px.pie(df_gastos, names="Categoria", values="Valor", hole=0.45, title="Distribuição dos gastos")
-            st.plotly_chart(fig, width="stretch")
+            st.plotly_chart(
+            fig,
+            width="stretch",
+            config={"staticPlot": True, "displayModeBar": False},
+        )
         else:
             st.info("Não existem despesas registradas para compor o gráfico.")
 
@@ -963,7 +1005,11 @@ def _exibir_dashboard_financeiro(motor: dict, resumo: dict, dre: dict, balanco: 
         fig = px.line(df_fluxo, x="Etapa", y="Saldo", markers=True, hover_data=["Descrição"], title="Evolução do saldo bancário")
         fig.add_hline(y=0, line_dash="dash")
         fig.update_layout(xaxis_title="Movimentações", yaxis_title="Saldo (R$)")
-        st.plotly_chart(fig, width="stretch")
+        st.plotly_chart(
+            fig,
+            width="stretch",
+            config={"staticPlot": True, "displayModeBar": False},
+        )
 
     col3, col4 = st.columns(2)
     with col3:
@@ -978,7 +1024,11 @@ def _exibir_dashboard_financeiro(motor: dict, resumo: dict, dre: dict, balanco: 
         if not composicao_ativo.empty:
             fig = px.bar(composicao_ativo, x="Conta", y="Valor", title="Composição do Ativo")
             fig.update_layout(xaxis_title="", yaxis_title="Valor (R$)", showlegend=False)
-            st.plotly_chart(fig, width="stretch")
+            st.plotly_chart(
+            fig,
+            width="stretch",
+            config={"staticPlot": True, "displayModeBar": False},
+        )
     with col4:
         margem = (dre["lucro_liquido"] / dre["receita_liquida"] * 100) if dre["receita_liquida"] else 0.0
         fig = go.Figure(go.Indicator(
@@ -989,13 +1039,17 @@ def _exibir_dashboard_financeiro(motor: dict, resumo: dict, dre: dict, balanco: 
             gauge={"axis": {"range": [-100, 100]}, "threshold": {"line": {"width": 4}, "value": 0}},
         ))
         fig.update_layout(height=330)
-        st.plotly_chart(fig, width="stretch")
+        st.plotly_chart(
+            fig,
+            width="stretch",
+            config={"staticPlot": True, "displayModeBar": False},
+        )
 
 
 def pagina_planejamento_concluido() -> None:
     cabecalho(compacto=True)
     st.success(f"Missão concluída, {st.session_state.get('perfil_participante', {}).get('nome', 'gestor')}!")
-    st.title("Missão concluída — resultados financeiros")
+    st.title("Missão concluída: resultados financeiros")
     st.info(
         "Nesta versão, 80% da receita de inscrições é considerada recebida no Banco "
         "Conta Movimento e 20% permanece inicialmente em Contas a Receber. Essa "
@@ -1051,7 +1105,7 @@ def pagina_planejamento_concluido() -> None:
 
     st.divider()
     exibir_conceito("fluxo_caixa")
-    st.subheader("Fluxo de Caixa do Projeto — analítico")
+    st.subheader("Fluxo de Caixa do Projeto (analítico)")
     fluxo = calcular_fluxo_caixa(motor)
     tabela_fluxo = [
         {
@@ -1074,7 +1128,7 @@ def pagina_planejamento_concluido() -> None:
 
     st.divider()
     exibir_conceito("dre")
-    st.subheader("Demonstração do Resultado do Projeto — analítica")
+    st.subheader("Demonstração do Resultado do Projeto (analítica)")
     if dre["linhas"]:
         _tabela_monetaria(dre["linhas"])
     else:
@@ -1109,7 +1163,7 @@ def pagina_planejamento_concluido() -> None:
 
     st.divider()
     exibir_conceito("balanco")
-    st.subheader("Balanço Patrimonial Simplificado do Projeto — analítico")
+    st.subheader("Balanço Patrimonial Simplificado do Projeto (analítico)")
     exibir_titulo_com_ajuda("Ativo", TERMOS_EDUCACIONAIS["ativo"])
     _tabela_monetaria(balanco["ativo"])
     st.metric("Total do Ativo", formatar_moeda(balanco["total_ativo"]))
@@ -1145,7 +1199,7 @@ def pagina_planejamento_concluido() -> None:
 
     st.divider()
     exibir_conceito("indicadores")
-    st.subheader("Indicadores Financeiros do Projeto — analíticos")
+    st.subheader("Indicadores Financeiros do Projeto (analíticos)")
     st.caption(
         "Os indicadores utilizam somente valores efetivamente registrados na simulação. "
         "Quando a base de cálculo é zero ou não existe passivo, o resultado é apresentado "
@@ -1160,6 +1214,12 @@ def pagina_planejamento_concluido() -> None:
                     exibir_titulo_com_ajuda(
                         indicador["Indicador"],
                         TERMOS_EDUCACIONAIS["roi"],
+                        nivel="###",
+                    )
+                elif indicador["Indicador"].strip().lower() == "margem líquida":
+                    exibir_titulo_com_ajuda(
+                        indicador["Indicador"],
+                        TERMOS_EDUCACIONAIS["margem_liquida"],
                         nivel="###",
                     )
                 else:
@@ -1283,14 +1343,18 @@ def pagina_planejamento_concluido() -> None:
         tutor_ia=st.session_state.get("feedback_tutor_ia", ""),
     )
     st.download_button(
-        "Baixar relatório completo",
+        "Baixar relatório para imprimir ou salvar em PDF",
         data=relatorio_html,
         file_name=f"STEM_FinanceLab_missao_tentativa_{st.session_state.get('numero_tentativa', 1)}.html",
         mime="text/html",
         type="primary",
         width="stretch",
     )
-    st.caption("O relatório HTML pode ser aberto no navegador e impresso ou salvo como PDF.")
+    st.info(
+        "Para imprimir: baixe o relatório, abra o arquivo no navegador e use a opção "
+        "Imprimir. No celular, escolha Compartilhar ou Menu e depois Imprimir; também "
+        "é possível selecionar Salvar como PDF."
+    )
 
     st.caption(
         f"Tentativa concluída: {st.session_state.get('numero_tentativa', 1)}. "

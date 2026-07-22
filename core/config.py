@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 
 APP_NAME = "STEM FinanceLab"
-APP_VERSION = "0.5.4"
+APP_VERSION = "0.5.6"
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_DB_PATH = PROJECT_ROOT / "database" / "stem_financelab.db"
 
