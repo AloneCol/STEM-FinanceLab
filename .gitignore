@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ambientes virtuais
+.venv/
+venv/
+env/
+
+# Arquivos de ambiente
+.env
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Banco de dados
+database/*.db
+*.sqlite
+*.sqlite3
+
+# Sistema Operacional
+.DS_Store
+Thumbs.db
