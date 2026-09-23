@@ -230,7 +230,8 @@ def pagina_inicial() -> None:
 
     col_tempo, col_objetivo, col_alerta = st.columns(3)
     with col_tempo:
-        st.info("⏱️ **Tempo estimado:** 20 a 25 minutos")
+        #st.info("⏱️ **Tempo estimado:** 20 a 25 minutos")
+        st.info("⏱️ **No seu ritmo:** você define a duração e o tempo de cada etapa")
     with col_objetivo:
         st.success("🎯 **Objetivo:** concluir a missão com equilíbrio financeiro")
     with col_alerta:
