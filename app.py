@@ -6,7 +6,8 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
-from core.config import APP_VERSION
+from core.config import APP_VERSION, MODO_PESQUISA
+from core.tcle import TCLE_TEXTO, tcle_pendente
 from core.logging_config import configurar_logs
 from core.database import (
     inicializar_banco,
@@ -230,8 +231,7 @@ def pagina_inicial() -> None:
 
     col_tempo, col_objetivo, col_alerta = st.columns(3)
     with col_tempo:
-        #st.info("⏱️ **Tempo estimado:** 20 a 25 minutos")
-        st.info("⏱️ **No seu ritmo:** você define a duração e o tempo de cada etapa")
+        st.info("⏱️ **Tempo estimado:** 20 a 25 minutos")
     with col_objetivo:
         st.success("🎯 **Objetivo:** concluir a missão com equilíbrio financeiro")
     with col_alerta:
@@ -284,8 +284,30 @@ def pagina_inicial() -> None:
         )
 
     st.markdown("### Identificação do gestor")
+
+    if MODO_PESQUISA:
+        if tcle_pendente():
+            st.error(
+                "O modo pesquisa está ativo, mas o TCLE ainda tem campos não "
+                "preenchidos ([A PREENCHER] em core/tcle.py). Complete o texto "
+                "com os dados do CEP antes de iniciar a coleta oficial."
+            )
+        with st.expander("Termo de Consentimento Livre e Esclarecido (TCLE)", expanded=True):
+            st.markdown(TCLE_TEXTO)
+        rotulo_identificacao = "Código ou apelido do participante *"
+        ajuda_identificacao = (
+            "Não utilize seu nome real. Crie um código ou apelido (por exemplo, "
+            "duas iniciais e dois números) e repita-o no questionário inicial e "
+            "no questionário final da pesquisa."
+        )
+        mensagem_erro_identificacao = "Informe um código ou apelido para iniciar a missão."
+    else:
+        rotulo_identificacao = "Nome ou identificação do participante *"
+        ajuda_identificacao = None
+        mensagem_erro_identificacao = "Informe o nome ou uma identificação para iniciar a missão."
+
     with st.form("form_identificacao", clear_on_submit=False):
-        nome = st.text_input("Nome ou identificação do participante *", max_chars=100)
+        nome = st.text_input(rotulo_identificacao, max_chars=100, help=ajuda_identificacao)
         c1, c2 = st.columns(2)
         with c1:
             instituicao = st.text_input("Instituição (opcional)", max_chars=120)
@@ -319,15 +341,21 @@ def pagina_inicial() -> None:
             "manter o equilíbrio financeiro, controlar os riscos e concluir a missão com recursos sustentáveis."
         )
 
-        consentimento = st.checkbox(
-            "Declaro que compreendi a finalidade acadêmica da ferramenta e concordo "
-            "com o uso agregado e não público das respostas para avaliação do estudo."
-        )
+        if MODO_PESQUISA:
+            consentimento = st.checkbox(
+                "Li e concordo com os termos do Termo de Consentimento Livre e "
+                "Esclarecido (TCLE) apresentado acima."
+            )
+        else:
+            consentimento = st.checkbox(
+                "Declaro que compreendi a finalidade acadêmica da ferramenta e concordo "
+                "com o uso agregado e não público das respostas para avaliação do estudo."
+            )
         iniciar = st.form_submit_button("▶ Iniciar missão", type="primary", width="stretch")
 
     if iniciar:
         if not nome.strip():
-            st.error("Informe o nome ou uma identificação para iniciar a missão.")
+            st.error(mensagem_erro_identificacao)
             return
         if not consentimento:
             st.error("É necessário registrar a concordância para continuar.")
