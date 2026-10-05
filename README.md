@@ -6,7 +6,7 @@ O STEM FinanceLab é um simulador educacional de gestão financeira desenvolvido
 
 Para executar o sistema localmente, é necessário possuir Python 3.10 ou superior.
 
-```bash
+```
 python -m venv .venv
 
 # Windows
@@ -27,12 +27,26 @@ A IA não é responsável pelos cálculos financeiros nem pelas regras principai
 
 Para utilizar o recurso de IA localmente, copie o arquivo `.streamlit/secrets.toml.example` para `.streamlit/secrets.toml` e configure:
 
-```text
+```
 OPENAI_API_KEY = "sua_chave"
 OPENAI_MODEL = "gpt-5-mini"
 ```
 
 A chave de acesso utilizada no ambiente de desenvolvimento não deve ser publicada no GitHub.
+
+## Modo pesquisa
+
+Além do modo público, o sistema tem um modo pesquisa, usado durante a coleta de dados da dissertação.
+
+No modo pesquisa, a tela inicial mostra o TCLE completo antes da identificação, e o campo de identificação pede um código ou apelido no lugar do nome do participante. Fora desse modo, continua valendo o comportamento padrão (nome e consentimento resumido).
+
+Para ativar, defina a variável de ambiente:
+
+```
+STEM_FINANCELAB_MODO_PESQUISA = true
+```
+
+O texto do TCLE está em `core/tcle.py`. Antes de ativar esse modo em produção, confira se os campos marcados como `[A PREENCHER]` já foram preenchidos (contato do pesquisador, prazo de guarda dos dados e número do parecer do CEP).
 
 ## Execução no Streamlit Community Cloud
 
@@ -41,7 +55,7 @@ Para disponibilizar o sistema na Web:
 1. Envie os arquivos do projeto para um repositório no GitHub.
 2. Acesse o Streamlit Community Cloud e selecione o repositório.
 3. Defina `app.py` como arquivo principal da aplicação.
-4. Configure `OPENAI_API_KEY` na área de Secrets, caso o módulo de IA seja utilizado.
+4. Configure `OPENAI_API_KEY` na área de Secrets, caso o módulo de IA seja utilizado, e `STEM_FINANCELAB_MODO_PESQUISA` durante o período de coleta de dados.
 5. Publique a aplicação e realize os testes previstos em `TESTE_WEB_PILOTO.md`.
 
 ## Banco de dados
@@ -50,7 +64,7 @@ O STEM FinanceLab utiliza SQLite para armazenamento dos dados da simulação.
 
 O banco é criado automaticamente no seguinte diretório:
 
-```text
+```
 database/stem_financelab.db
 ```
 
