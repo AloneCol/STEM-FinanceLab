@@ -17,3 +17,13 @@ def obter_caminho_banco() -> Path:
     if not caminho.is_absolute():
         caminho = PROJECT_ROOT / caminho
     return caminho.resolve()
+
+
+# ---------------------------------------------------------------------------
+# Modo pesquisa: ativa o fluxo de TCLE completo e o campo de identificação
+# por código/apelido, usado durante a coleta oficial de dados da dissertação.
+# Fora deste modo (padrão), o sistema mantém o comportamento público atual.
+# Ativar definindo a variável de ambiente STEM_FINANCELAB_MODO_PESQUISA=true
+# nos "Secrets" do Streamlit Community Cloud durante o período de coleta.
+# ---------------------------------------------------------------------------
+MODO_PESQUISA = os.getenv("STEM_FINANCELAB_MODO_PESQUISA", "false").strip().lower() == "true"
