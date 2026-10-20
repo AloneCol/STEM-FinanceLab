@@ -116,7 +116,7 @@ def controle_encerramento_durante_missao() -> None:
     """Exibe uma saída discreta e exige confirmação antes de interromper a tentativa."""
     col_espaco, col_acao = st.columns([5, 1])
     with col_acao:
-        if st.button("Encerrar sessão", key="abrir_confirmacao_encerramento", width="stretch"):
+        if st.button("🚪 Encerrar sessão", key="abrir_confirmacao_encerramento", width="stretch"):
             st.session_state.confirmar_encerramento = True
 
     if st.session_state.get("confirmar_encerramento"):
@@ -1420,7 +1420,7 @@ def pagina_planejamento_concluido() -> None:
             st.rerun()
 
     with col_encerrar:
-        if st.button("Encerrar sessão", width="stretch"):
+        if st.button("🚪 Encerrar sessão", width="stretch"):
             encerrar_para_agradecimento("concluida")
 
 
