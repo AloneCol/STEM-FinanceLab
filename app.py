@@ -116,7 +116,7 @@ def controle_encerramento_durante_missao() -> None:
     """Exibe uma saída discreta e exige confirmação antes de interromper a tentativa."""
     col_espaco, col_acao = st.columns([5, 1])
     with col_acao:
-        if st.button("🚪 Encerrar sessão", key="abrir_confirmacao_encerramento", width="stretch"):
+        if st.button("Encerrar sessão", key="abrir_confirmacao_encerramento", width="stretch"):
             st.session_state.confirmar_encerramento = True
 
     if st.session_state.get("confirmar_encerramento"):
@@ -143,7 +143,7 @@ def controle_encerramento_durante_missao() -> None:
 def exibir_conceito(chave: str) -> None:
     conceito = CONCEITOS[chave]
 
-    with st.expander(f"📘 {conceito['titulo']}"):
+    with st.expander(conceito['titulo']):
         st.markdown("**O que é?**")
         st.write(conceito["definicao"])
 
@@ -231,7 +231,7 @@ def pagina_inicial() -> None:
 
     col_tempo, col_objetivo, col_alerta = st.columns(3)
     with col_tempo:
-        st.info("⏱️ **Tempo estimado:** 20 a 25 minutos")
+        st.info("⏱️ **Tempo:** varia conforme seu ritmo de decisão")
     with col_objetivo:
         st.success("🎯 **Objetivo:** concluir a missão com equilíbrio financeiro")
     with col_alerta:
@@ -272,7 +272,7 @@ def pagina_inicial() -> None:
             unsafe_allow_html=True,
         )
 
-    with st.expander("ℹ️ Sobre esta pesquisa"):
+    with st.expander("Sobre esta pesquisa"):
         st.write(
             "O STEM FinanceLab é um artefato desenvolvido no âmbito de um Mestrado Profissional. "
             "Seu objetivo é apoiar o ensino de princípios financeiros por meio de um Serious Game "
@@ -351,7 +351,7 @@ def pagina_inicial() -> None:
                 "Declaro que compreendi a finalidade acadêmica da ferramenta e concordo "
                 "com o uso agregado e não público das respostas para avaliação do estudo."
             )
-        iniciar = st.form_submit_button("▶ Iniciar missão", type="primary", width="stretch")
+        iniciar = st.form_submit_button("Iniciar missão", type="primary", width="stretch")
 
     if iniciar:
         if not nome.strip():
@@ -1290,18 +1290,18 @@ def pagina_planejamento_concluido() -> None:
     with col_acertos:
         st.markdown("### O que contribuiu positivamente")
         for item in feedback["acertos"]:
-            st.markdown(f"- ✅ {item}")
+            st.markdown(f"- {item}")
     with col_atencao:
         st.markdown("### Pontos de atenção")
         for item in feedback["atencao"]:
-            st.markdown(f"- ⚠️ {item}")
+            st.markdown(f"- {item}")
 
     st.markdown("### O que fazer na próxima tentativa")
     for item in feedback["recomendacoes"]:
         st.markdown(f"- {item}")
 
     st.divider()
-    st.subheader("🤖 Tutor Inteligente")
+    st.subheader("Tutor Inteligente")
     st.caption(
         "A inteligência artificial não realiza os cálculos financeiros. Ela recebe "
         "somente os resultados já apurados pelo motor determinístico e os transforma "
@@ -1394,7 +1394,7 @@ def pagina_planejamento_concluido() -> None:
     col_nova, col_encerrar = st.columns(2)
 
     with col_nova:
-        if st.button("🔄 Jogar novamente", type="primary", width="stretch"):
+        if st.button("Jogar novamente", type="primary", width="stretch"):
             participante_id = st.session_state.get("participante_id")
             perfil_participante = dict(st.session_state.get("perfil_participante", {}))
             diagnostico = dict(st.session_state.get("diagnostico", {}))
@@ -1420,7 +1420,7 @@ def pagina_planejamento_concluido() -> None:
             st.rerun()
 
     with col_encerrar:
-        if st.button("🚪 Encerrar sessão", width="stretch"):
+        if st.button("Encerrar sessão", width="stretch"):
             encerrar_para_agradecimento("concluida")
 
 
