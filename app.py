@@ -99,6 +99,7 @@ aplicar_estilo()
 
 def ir_para(etapa: str) -> None:
     st.session_state.etapa = etapa
+    st.session_state.rolar_topo_pendente = True
     st.rerun()
 
 
@@ -109,6 +110,7 @@ def encerrar_para_agradecimento(motivo: str) -> None:
     st.session_state.etapa = "agradecimento"
     st.session_state.nome_agradecimento = nome
     st.session_state.motivo_encerramento = motivo
+    st.session_state.rolar_topo_pendente = True
     st.rerun()
 
 
@@ -531,6 +533,7 @@ def pagina_cenario() -> None:
     with col1:
         if st.button("Voltar ao início", width="stretch"):
             st.session_state.clear()
+            st.session_state.rolar_topo_pendente = True
             st.rerun()
     with col2:
         if st.button("Confirmar estratégia e planejar", type="primary", width="stretch"):
@@ -785,7 +788,6 @@ def pagina_planejamento() -> None:
         ]
         st.session_state.indice_evento = 0
         st.session_state.decisoes_eventos = []
-        st.session_state.rolar_topo_evento = True
 
         ir_para("evento")
 
@@ -793,9 +795,6 @@ def pagina_planejamento() -> None:
 def pagina_evento() -> None:
     cabecalho(compacto=True)
     st.title("Eventos inesperados")
-
-    if st.session_state.pop("rolar_topo_evento", False):
-        rolar_para_topo()
 
     if "eventos_sorteados" not in st.session_state:
         st.session_state.eventos_sorteados = sortear_eventos(
@@ -955,7 +954,7 @@ def pagina_evento() -> None:
         if st.session_state.indice_evento >= total_eventos:
             ir_para("planejamento_concluido")
         else:
-            st.session_state.rolar_topo_evento = True
+            st.session_state.rolar_topo_pendente = True
             st.rerun()
 
 
@@ -1417,6 +1416,7 @@ def pagina_planejamento_concluido() -> None:
             st.session_state.numero_tentativa = proxima_tentativa
             st.session_state.simulacao_finalizada = False
             st.session_state.etapa = "cenario"
+            st.session_state.rolar_topo_pendente = True
             st.rerun()
 
     with col_encerrar:
@@ -1450,11 +1450,15 @@ def pagina_agradecimento() -> None:
     if st.button("Voltar à página inicial", type="primary", width="stretch"):
         st.session_state.clear()
         st.session_state.etapa = "inicio"
+        st.session_state.rolar_topo_pendente = True
         st.rerun()
 
 
 
 etapa = st.session_state.get("etapa", "inicio")
+
+if st.session_state.pop("rolar_topo_pendente", False):
+    rolar_para_topo()
 
 if etapa in {"diagnostico", "cenario", "planejamento", "evento"}:
     controle_encerramento_durante_missao()
