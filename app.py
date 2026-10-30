@@ -6,6 +6,10 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
+px.defaults.template = "plotly_white"
+PALETA_GRAFICOS = ["#237a32", "#4b5563", "#2f6f9f", "#8a9a5b", "#9ca3af", "#b45309"]
+px.defaults.color_discrete_sequence = PALETA_GRAFICOS
+
 from core.config import APP_VERSION, MODO_PESQUISA
 from core.tcle import TCLE_TEXTO, tcle_pendente
 from core.logging_config import configurar_logs
@@ -80,7 +84,7 @@ def rolar_para_topo() -> None:
     )
 
 st.set_page_config(
-    page_title="STEM FinanceLab: Jogo Estratégico",
+    page_title="STEM FinanceLab: Simulador Educacional",
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -95,6 +99,15 @@ except Exception:
 
 inicializar_sessao()
 aplicar_estilo()
+
+
+def md(texto) -> str:
+    """Escapa o cifrão para o Streamlit não tratar R$ ... R$ como fórmula."""
+    return str(texto).replace("$", "\\$")
+
+
+def moeda_md(valor: float) -> str:
+    return md(formatar_moeda(valor))
 
 
 def ir_para(etapa: str) -> None:
@@ -118,7 +131,12 @@ def controle_encerramento_durante_missao() -> None:
     """Exibe uma saída discreta e exige confirmação antes de interromper a tentativa."""
     col_espaco, col_acao = st.columns([5, 1])
     with col_acao:
-        if st.button("🚪 Encerrar sessão", key="abrir_confirmacao_encerramento", width="stretch"):
+        if st.button(
+            "Encerrar sessão",
+            key="abrir_confirmacao_encerramento",
+            icon=":material/logout:",
+            width="stretch",
+        ):
             st.session_state.confirmar_encerramento = True
 
     if st.session_state.get("confirmar_encerramento"):
@@ -206,8 +224,8 @@ def pagina_inicial() -> None:
     st.markdown(
         """
         <div class="hero-subtitle">
-            Bem-vindo ao STEM FinanceLab. Assuma o papel de gestor financeiro,
-            administre recursos limitados e acompanhe as consequências de cada decisão.
+            Você vai organizar financeiramente um evento acadêmico, decidir como usar
+            recursos limitados e acompanhar as consequências de cada decisão.
         </div>
         """,
         unsafe_allow_html=True,
@@ -216,15 +234,15 @@ def pagina_inicial() -> None:
     st.markdown(
         """
         <div class="info-card">
-            <h3>Sua experiência nesta missão</h3>
+            <h3>O que você vai fazer</h3>
             <p>
-                Você será responsável pela organização financeira de um evento. Ao longo do jogo,
-                suas decisões influenciarão o orçamento, o fluxo de caixa, a Demonstração do Resultado
-                e o Balanço Patrimonial.
+                Você é responsável pela organização financeira de um evento. Suas decisões
+                influenciam o orçamento, o fluxo de caixa, a Demonstração do Resultado e o
+                Balanço Patrimonial.
             </p>
             <p>
-                Ao final, você poderá analisar seu desempenho, refletir sobre as escolhas realizadas
-                e identificar como aperfeiçoar sua estratégia em uma nova tentativa.
+                Ao final, você analisa o desempenho, reflete sobre as escolhas e pode tentar
+                uma nova estratégia.
             </p>
         </div>
         """,
@@ -233,26 +251,26 @@ def pagina_inicial() -> None:
 
     col_tempo, col_objetivo, col_alerta = st.columns(3)
     with col_tempo:
-        st.info("⏱️ **Tempo:** varia conforme seu ritmo de decisão")
+        st.info("**Tempo:** varia conforme seu ritmo de decisão", icon=":material/schedule:")
     with col_objetivo:
-        st.success("🎯 **Objetivo:** concluir a missão com equilíbrio financeiro")
+        st.info("**Objetivo:** concluir a missão com equilíbrio financeiro", icon=":material/flag:")
     with col_alerta:
-        st.warning("⚠️ **Atenção:** cada decisão poderá alterar o resultado")
+        st.info("**Atenção:** cada decisão altera o resultado", icon=":material/warning:")
 
     col_apresentacao, col_missao = st.columns([1.05, 1])
     with col_apresentacao:
         st.markdown(
             """
             <div class="info-card">
-                <h3>Sobre o jogo</h3>
+                <h3>Sobre o simulador</h3>
                 <p>
-                    O STEM FinanceLab é um jogo estratégico de gerenciamento de recursos
-                    voltado ao ensino de princípios financeiros a profissionais e estudantes
-                    das áreas STEM.
+                    O STEM FinanceLab é um simulador educacional gamificado de gestão financeira
+                    voltado ao ensino de planejamento e controle financeiro a estudantes e
+                    profissionais das áreas STEM.
                 </p>
                 <p>
-                    Em um ambiente seguro, você poderá planejar, decidir, enfrentar desafios
-                    e aprender com os efeitos financeiros das próprias escolhas.
+                    Em um ambiente controlado, você planeja, decide e aprende com os
+                    efeitos financeiros das próprias escolhas.
                 </p>
             </div>
             """,
@@ -277,8 +295,8 @@ def pagina_inicial() -> None:
     with st.expander("Sobre esta pesquisa"):
         st.write(
             "O STEM FinanceLab é um artefato desenvolvido no âmbito de um Mestrado Profissional. "
-            "Seu objetivo é apoiar o ensino de princípios financeiros por meio de um Serious Game "
-            "aplicado a profissionais e estudantes das áreas STEM."
+            "Seu objetivo é apoiar o ensino de princípios financeiros por meio de um simulador educacional "
+            "gamificado aplicado a estudantes e profissionais das áreas STEM."
         )
         st.write(
             "A participação na simulação contribui para a avaliação do artefato e para sua evolução "
@@ -311,15 +329,25 @@ def pagina_inicial() -> None:
     with st.form("form_identificacao", clear_on_submit=False):
         nome = st.text_input(rotulo_identificacao, max_chars=100, help=ajuda_identificacao)
         c1, c2 = st.columns(2)
+        opcoes_vinculo = ["Estudante", "Professor(a)", "Profissional"]
         with c1:
-            instituicao = st.text_input("Instituição (opcional)", max_chars=120)
-            curso = st.text_input("Curso ou área de formação (opcional)", max_chars=120)
+            if MODO_PESQUISA:
+                # Instituição e curso, combinados, podem identificar o participante.
+                instituicao = ""
+                curso = ""
+            else:
+                instituicao = st.text_input("Instituição (opcional)", max_chars=120)
+                curso = st.text_input("Curso ou área de formação (opcional)", max_chars=120)
             area = st.selectbox(
                 "Área principal",
                 ["Computação", "Engenharia", "Matemática", "Ciências Naturais", "Tecnologia", "Outra área STEM"],
             )
+            if MODO_PESQUISA:
+                # Mantém as duas colunas equilibradas sem os campos ocultos.
+                perfil = st.selectbox("Vínculo principal", opcoes_vinculo)
         with c2:
-            perfil = st.selectbox("Vínculo principal", ["Estudante", "Professor(a)", "Profissional"])
+            if not MODO_PESQUISA:
+                perfil = st.selectbox("Vínculo principal", opcoes_vinculo)
             experiencia = st.selectbox(
                 "Tempo de experiência",
                 ["Sem experiência profissional", "Menos de 1 ano", "1 a 2 anos", "3 a 5 anos", "6 a 10 anos", "Mais de 10 anos"],
@@ -338,7 +366,7 @@ def pagina_inicial() -> None:
         cenario = obter_cenario(missao)
         st.info(
             f"**Apresentação da missão:** você será responsável por organizar o {cenario['nome']}, "
-            f"com orçamento inicial de {formatar_moeda(cenario['orcamento_inicial'])} e "
+            f"com orçamento inicial de {moeda_md(cenario['orcamento_inicial'])} e "
             f"capacidade máxima para {cenario['capacidade']} participantes. Seu objetivo é "
             "manter o equilíbrio financeiro, controlar os riscos e concluir a missão com recursos sustentáveis."
         )
@@ -353,7 +381,9 @@ def pagina_inicial() -> None:
                 "Declaro que compreendi a finalidade acadêmica da ferramenta e concordo "
                 "com o uso agregado e não público das respostas para avaliação do estudo."
             )
-        iniciar = st.form_submit_button("Iniciar missão", type="primary", width="stretch")
+        iniciar = st.form_submit_button(
+            "Iniciar missão", type="primary", icon=":material/play_arrow:", width="stretch"
+        )
 
     if iniciar:
         if not nome.strip():
@@ -527,7 +557,7 @@ def pagina_cenario() -> None:
     if modelo == "Evento gratuito patrocinado" and apoio_externo <= 0:
         avisos.append("O evento gratuito foi iniciado sem patrocínio, aumentando o risco de insuficiência financeira.")
     for aviso in avisos:
-        st.warning(aviso)
+        st.warning(md(aviso))
 
     col1, col2 = st.columns(2)
     with col1:
@@ -587,7 +617,7 @@ def pagina_planejamento() -> None:
 
     st.caption(
         f"Evento: {cenario['nome']} | "
-        f"Recursos disponíveis: {formatar_moeda(recursos_disponiveis)}"
+        f"Recursos disponíveis: {moeda_md(recursos_disponiveis)}"
     )
 
     st.subheader("1. Distribuição estratégica")
@@ -641,9 +671,9 @@ def pagina_planejamento() -> None:
             "O sistema identificou riscos, mas não impedirá a continuidade."
         )
         for aviso in riscos_alocacao:
-            st.write(f"• {aviso}")
+            st.write(f"• {md(aviso)}")
     else:
-        st.success(mensagem)
+        st.success(md(mensagem))
 
     st.divider()
     st.subheader("2. Escolhas táticas")
@@ -673,8 +703,8 @@ def pagina_planejamento() -> None:
         if escolha["custo"] > limite:
             st.warning(
                 f"A alternativa selecionada custa "
-                f"{formatar_moeda(escolha['custo'])}, mas você destinou "
-                f"{formatar_moeda(limite)} à categoria."
+                f"{moeda_md(escolha['custo'])}, mas você destinou "
+                f"{moeda_md(limite)} à categoria."
             )
 
     valido_tatico, mensagem_tatica = validar_escolhas_taticas(
@@ -687,11 +717,11 @@ def pagina_planejamento() -> None:
     )
 
     if riscos_taticos:
-        st.warning(mensagem_tatica)
+        st.warning(md(mensagem_tatica))
         for aviso in riscos_taticos:
-            st.write(f"• {aviso}")
+            st.write(f"• {md(aviso)}")
     else:
-        st.success(mensagem_tatica)
+        st.success(md(mensagem_tatica))
 
     st.divider()
     st.subheader("Resumo do planejamento")
@@ -975,7 +1005,7 @@ def _tabela_monetaria(linhas: list[dict]) -> None:
 def _exibir_observacoes(titulo: str, observacoes: list[str]) -> None:
     st.markdown(f"**{titulo}**")
     for texto in observacoes:
-        st.markdown(f"- {texto}")
+        st.markdown(f"- {md(texto)}")
 
 
 def _exibir_dashboard_financeiro(motor: dict, resumo: dict, dre: dict, balanco: dict) -> None:
@@ -1015,6 +1045,7 @@ def _exibir_dashboard_financeiro(motor: dict, resumo: dict, dre: dict, balanco: 
         if gastos:
             df_gastos = pd.DataFrame({"Categoria": list(gastos), "Valor": list(gastos.values())})
             fig = px.pie(df_gastos, names="Categoria", values="Valor", hole=0.45, title="Distribuição dos gastos")
+            fig.update_traces(marker={"colors": PALETA_GRAFICOS})
             st.plotly_chart(
             fig,
             width="stretch",
@@ -1064,7 +1095,11 @@ def _exibir_dashboard_financeiro(motor: dict, resumo: dict, dre: dict, balanco: 
             value=margem,
             number={"suffix": "%"},
             title={"text": "Margem líquida"},
-            gauge={"axis": {"range": [-100, 100]}, "threshold": {"line": {"width": 4}, "value": 0}},
+            gauge={
+                "axis": {"range": [-100, 100]},
+                "bar": {"color": "#4b5563"},
+                "threshold": {"line": {"width": 4}, "value": 0},
+            },
         ))
         fig.update_layout(height=330)
         st.plotly_chart(
@@ -1127,8 +1162,8 @@ def pagina_planejamento_concluido() -> None:
         )
     else:
         st.success(
-            f"Após preservar a reserva de {formatar_moeda(resumo_motor['reserva_planejada'])}, "
-            f"o projeto mantém {formatar_moeda(resumo_motor['caixa_livre_apos_reserva'])} livres."
+            f"Após preservar a reserva de {moeda_md(resumo_motor['reserva_planejada'])}, "
+            f"o projeto mantém {moeda_md(resumo_motor['caixa_livre_apos_reserva'])} livres."
         )
 
     st.divider()
@@ -1253,7 +1288,7 @@ def pagina_planejamento_concluido() -> None:
                 else:
                     st.markdown(f"### {indicador['Indicador']}")
                 st.markdown(f"**Fórmula:** {indicador['Fórmula']}")
-                st.markdown(f"**Memória de cálculo:** {indicador['Memória de cálculo']}")
+                st.markdown(f"**Memória de cálculo:** {md(indicador['Memória de cálculo'])}")
             with c_res:
                 resultado = indicador["Resultado"]
                 if resultado is None:
@@ -1279,25 +1314,25 @@ def pagina_planejamento_concluido() -> None:
     feedback = gerar_feedback_aprendizagem(
         motor, resumo_motor, dre, indicadores
     )
-    st.info(feedback["mensagem"])
+    st.info(md(feedback["mensagem"]))
 
     st.markdown("### Resultado")
     for item in feedback["fatos"]:
-        st.markdown(f"- {item}")
+        st.markdown(f"- {md(item)}")
 
     col_acertos, col_atencao = st.columns(2)
     with col_acertos:
         st.markdown("### O que contribuiu positivamente")
         for item in feedback["acertos"]:
-            st.markdown(f"- {item}")
+            st.markdown(f"- {md(item)}")
     with col_atencao:
         st.markdown("### Pontos de atenção")
         for item in feedback["atencao"]:
-            st.markdown(f"- {item}")
+            st.markdown(f"- {md(item)}")
 
     st.markdown("### O que fazer na próxima tentativa")
     for item in feedback["recomendacoes"]:
-        st.markdown(f"- {item}")
+        st.markdown(f"- {md(item)}")
 
     st.divider()
     st.subheader("Tutor Inteligente")
@@ -1326,7 +1361,7 @@ def pagina_planejamento_concluido() -> None:
 
         if st.session_state.get("feedback_tutor_ia"):
             with st.container(border=True):
-                st.markdown(st.session_state.feedback_tutor_ia)
+                st.markdown(md(st.session_state.feedback_tutor_ia))
             st.caption(
                 "Conteúdo gerado por IA a partir dos resultados da simulação. "
                 "A análise deve ser utilizada como apoio à reflexão."
@@ -1334,14 +1369,14 @@ def pagina_planejamento_concluido() -> None:
         elif st.session_state.get("erro_tutor_ia"):
             st.warning(st.session_state.erro_tutor_ia)
             with st.container(border=True):
-                st.markdown(montar_feedback_contingencia(feedback))
+                st.markdown(md(montar_feedback_contingencia(feedback)))
     else:
         st.warning(
             "Tutor Inteligente não configurado. A análise pedagógica baseada em regras "
             "continua disponível normalmente."
         )
         with st.container(border=True):
-            st.markdown(montar_feedback_contingencia(feedback))
+            st.markdown(md(montar_feedback_contingencia(feedback)))
         with st.expander("Como configurar o Tutor Inteligente"):
             st.code(
                 'OPENAI_API_KEY = "sua_chave_aqui"\n'
@@ -1393,7 +1428,7 @@ def pagina_planejamento_concluido() -> None:
     col_nova, col_encerrar = st.columns(2)
 
     with col_nova:
-        if st.button("Jogar novamente", type="primary", width="stretch"):
+        if st.button("Jogar novamente", type="primary", icon=":material/replay:", width="stretch"):
             participante_id = st.session_state.get("participante_id")
             perfil_participante = dict(st.session_state.get("perfil_participante", {}))
             diagnostico = dict(st.session_state.get("diagnostico", {}))
@@ -1420,7 +1455,7 @@ def pagina_planejamento_concluido() -> None:
             st.rerun()
 
     with col_encerrar:
-        if st.button("🚪 Encerrar sessão", width="stretch"):
+        if st.button("Encerrar sessão", icon=":material/logout:", width="stretch"):
             encerrar_para_agradecimento("concluida")
 
 
