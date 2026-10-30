@@ -6,7 +6,7 @@
     "codespaces": {
       "openFiles": [
         "README.md",
-        "STEM_FinanceLab_v0.5.4_Web_RC/app.py"
+        "app.py"
       ]
     },
     "vscode": {
@@ -19,7 +19,7 @@
   },
   "updateContentCommand": "[ -f packages.txt ] && sudo apt update && sudo apt upgrade -y && sudo xargs apt install -y <packages.txt; [ -f requirements.txt ] && pip3 install --user -r requirements.txt; pip3 install --user streamlit; echo '✅ Packages installed and Requirements met'",
   "postAttachCommand": {
-    "server": "streamlit run STEM_FinanceLab_v0.5.4_Web_RC/app.py --server.enableCORS false --server.enableXsrfProtection false"
+    "server": "streamlit run app.py --server.enableCORS false --server.enableXsrfProtection false"
   },
   "portsAttributes": {
     "8501": {
