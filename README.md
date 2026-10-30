@@ -38,7 +38,7 @@ A chave de acesso utilizada no ambiente de desenvolvimento não deve ser publica
 
 Além do modo público, o sistema tem um modo pesquisa, usado durante a coleta de dados da dissertação.
 
-No modo pesquisa, a tela inicial mostra o TCLE completo antes da identificação, e o campo de identificação pede um código ou apelido no lugar do nome do participante. Fora desse modo, continua valendo o comportamento padrão (nome e consentimento resumido).
+No modo pesquisa, a tela inicial mostra o TCLE completo antes da identificação, e o campo de identificação pede um código ou apelido no lugar do nome do participante. Os campos de instituição e curso deixam de ser exibidos, pois combinados podem identificar a pessoa. Fora desse modo, continua valendo o comportamento padrão (nome e consentimento resumido).
 
 Para ativar, defina a variável de ambiente:
 
@@ -46,7 +46,7 @@ Para ativar, defina a variável de ambiente:
 STEM_FINANCELAB_MODO_PESQUISA = true
 ```
 
-O texto do TCLE está em `core/tcle.py`. Antes de ativar esse modo em produção, confira se os campos marcados como `[A PREENCHER]` já foram preenchidos (contato do pesquisador, prazo de guarda dos dados e número do parecer do CEP).
+O texto do TCLE está em `core/tcle.py`. Antes de ativar esse modo em produção, confira se o campo marcado como `[A PREENCHER]` (número do parecer do CEP) já foi preenchido.
 
 ## Execução no Streamlit Community Cloud
 
