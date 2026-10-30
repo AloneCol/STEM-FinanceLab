@@ -91,9 +91,9 @@ def gerar_relatorio_html(
 <title>Relatório STEM FinanceLab</title>
 <style>
 body{{font-family:Arial,sans-serif;max-width:1000px;margin:32px auto;color:#1f2937;line-height:1.45}}
-h1,h2,h3{{color:#123b5d}} .muted{{color:#64748b}} .cards{{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}}
+h1,h2,h3{{color:#1e6b2d}} .muted{{color:#64748b}} .cards{{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}}
 .card,.box{{border:1px solid #d7dee7;border-radius:10px;padding:14px;background:#f8fafc}} .card strong{{display:block;font-size:1.15rem;margin-top:5px}}
-table{{width:100%;border-collapse:collapse;margin:12px 0 24px}} th,td{{border:1px solid #d7dee7;padding:8px;text-align:left;font-size:13px}} th{{background:#eaf1f7}}
+table{{width:100%;border-collapse:collapse;margin:12px 0 24px}} th,td{{border:1px solid #d7dee7;padding:8px;text-align:left;font-size:13px}} th{{background:#e8f3ea}}
 section{{margin-top:28px}} @media print{{body{{margin:10mm}} .cards{{grid-template-columns:repeat(2,1fr)}}}}
 </style>
 </head>
