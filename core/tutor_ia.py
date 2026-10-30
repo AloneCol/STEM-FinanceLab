@@ -8,7 +8,7 @@ from openai import OpenAI
 
 
 INSTRUCOES_TUTOR = """
-Você é o Tutor Inteligente do STEM FinanceLab, um Serious Game educacional.
+Você é o Tutor Inteligente do STEM FinanceLab, um simulador educacional gamificado.
 Sua função é interpretar pedagogicamente resultados financeiros que já foram
 calculados por um motor determinístico.
 
