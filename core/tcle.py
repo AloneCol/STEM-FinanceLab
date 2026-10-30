@@ -18,8 +18,11 @@ TCLE_TEXTO = """
 de Eventos Acadêmicos para Estudantes e Profissionais de STEM
 
 **Pesquisador responsável:** Ricardo Souza de Oliveira
+
 **Orientador:** Prof. Dr. Jefferson Oliveira Andrade
+
 **Coorientadora:** Prof.ª Dr.ª Luciana Lee
+
 **Instituição:** Instituto Federal do Espírito Santo (Ifes), Programa de
 Pós-Graduação em Computação Aplicada (PPCOMP)
 
@@ -29,8 +32,9 @@ conceitos básicos de planejamento e controle financeiro e quanto à
 usabilidade da ferramenta.
 
 **2. Procedimentos.** A participação envolve responder a um questionário
-inicial, utilizar o simulador em uma ou mais sessões completas (20 a 25
-minutos) e responder a um questionário final, com perguntas de conhecimento,
+inicial, utilizar o simulador em uma ou mais sessões completas, cuja
+duração varia conforme o seu ritmo de leitura e de tomada de decisão, e
+responder a um questionário final, com perguntas de conhecimento,
 percepção e usabilidade.
 
 **3. Riscos e benefícios.** Os riscos são mínimos, limitados a eventual
@@ -48,12 +52,13 @@ desistir a qualquer momento, sem necessidade de justificativa e sem
 qualquer prejuízo.
 
 **6. Armazenamento.** Os registros do simulador ficam associados apenas ao
-código escolhido por você, nunca ao seu nome. [A PREENCHER: prazo de guarda
-e procedimento de descarte dos dados, conforme definido com o CEP.]
+código escolhido por você, nunca ao seu nome. Os dados são guardados por
+cinco anos após a conclusão da pesquisa, prazo após o qual são descartados.
 
 **7. Contato.** Em caso de dúvidas, entre em contato com o pesquisador
-responsável [A PREENCHER: e-mail/telefone] ou com o Comitê de Ética em
-Pesquisa do Ifes (CEP/Ifes): Av. Rio Branco, nº 50, Santa Lúcia, Vitória,
+responsável, Ricardo Souza de Oliveira, pelo e-mail
+ti.ricardo.oliveira@gmail.com ou pelo telefone (27) 99996-9358, ou com o
+Comitê de Ética em Pesquisa do Ifes (CEP/Ifes): Av. Rio Branco, nº 50, Santa Lúcia, Vitória,
 ES, CEP 29056-255. Telefones: (27) 92001-6011 e (27) 3357-7518. E-mails:
 etica.pesquisa@ifes.edu.br e secretaria.cep@ifes.edu.br. Atendimento de
 segunda a sexta-feira, das 8h às 12h. [A PREENCHER após a aprovação:
